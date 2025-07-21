@@ -3,7 +3,7 @@ name = "html_code_generator"
 version = "0.1.0"
 description = "Library for generating frontend using Deepseek and Unsplash."
 readme = "README.md"
-requires-python = "==3.13.*"
+requires-python = ">=3.12"
 dependencies = [
     "httpx>=0.28.1",
     "langchain>=0.3.26",
