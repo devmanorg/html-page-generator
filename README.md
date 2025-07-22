@@ -3,14 +3,15 @@
 Библиотека для генерации HTML страниц с помощью ИИ. Пользователю достаточно описать своими словами страницу, которую он хочет получить. ИИ сами подберут изображения и напишут код страницы.
 
 Работает с двумя сервисами:
-Unsplash - для поиска подходящих картинок и Deepseek - для управления процессом и собственно генерации кода страницы.
+- Unsplash - для поиска подходящих картинок.
+- Deepseek - для управления процессом и собственно генерации кода страницы.
 
 # Подготовка
 
 Понадобятся ключи для сервисов:
 
-- `DEEPSEEK_API_KEY` - [получить](https://api-docs.deepseek.com/)
-- `UNSPLASH_CLIENT_ID` - [получить](https://unsplash.com/developers?ref=buffer-resources)
+- `DEEPSEEK_API_KEY` - API-ключ аутентификации. [Получить](https://api-docs.deepseek.com/).
+- `UNSPLASH_CLIENT_ID` - `Access Token` созданного Unsplash приложения. [Получить](https://unsplash.com/documentation#creating-a-developer-account).
 
 # Инициализация
 
