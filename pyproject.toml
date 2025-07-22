@@ -1,5 +1,5 @@
 [project]
-name = "html_code_generator"
+name = "html-page-generator"
 version = "0.1.0"
 description = "Library for generating frontend using Deepseek and Unsplash."
 readme = "README.md"
