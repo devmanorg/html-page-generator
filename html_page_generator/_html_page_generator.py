@@ -1,5 +1,6 @@
 import uuid
 from collections.abc import AsyncGenerator
+from datetime import datetime
 from io import StringIO
 
 from langchain_core.runnables import RunnableConfig
@@ -32,11 +33,19 @@ GENERATE_HTML_PROMPT = (
     "Не используй форматирование при выводе в виде ```html в начале и ``` в конце текста"
     "В ответе нужно будет присылать ТОЛЬКО сам код HTML+CSS+JS без дополнительных пояснений."
     "Полагаясь на системный промпт описанный выше обработай запрос: '{user_prompt}'."
+    "Сейчас {current_year} год."
     "На выходе нужен чистый HTML+CSS+JS без пояснений."
     "Не используй форматирование при выводе в виде ```html в начале и ``` в конце текста."
 )
 
 CHECK_HTML_PROMPT = (
+    "Проверь качество сгенерированной страницы. "
+    "Проверь ссылки на все картинки в html, они не должны возвращать 404. "
+    "Если всё хорошо, то верни ответ 'да', если нужно перегенерировать, то верни ответ 'нет'. "
+    "Больше ничего возвращать не нужно."
+)
+
+REGENERATE_HTML_PROMPT = (
     "Проверь качество сгенерированной страницы. "
     "Сгенерируй новую с учетом всех возможных улучшений. "
     "Не используй форматирование при выводе в виде ```html в начале и ``` в конце текста"
@@ -48,7 +57,7 @@ CHECK_HTML_PROMPT = (
 
 SITE_TITLE_PROMPT = (
     "Придумай название ориентируясь на тематику запроса: '{user_prompt}'. "
-    "Название должно состоять из 1-3 слов, разделенных пробелами. "
+    "Название должно содержать не более 3 слов, разделенных пробелами. "
     "В ответе пришли только придуманное название и ничего больше."
 )
 
@@ -56,12 +65,14 @@ SITE_TITLE_PROMPT = (
 class HtmlPage(BaseModel):
     html_code: str = ""
     title: str = ""
+    is_valid: bool = False
 
 
 class AsyncPageGenerator:
 
     def __init__(self, *, debug_mode: bool = False) -> None:
         self.html_page = HtmlPage()
+        self.current_year = datetime.now().year
 
         http_async_client = AsyncDeepseekClient.get_initialized_instance()
         model = ChatDeepSeek(
@@ -93,8 +104,12 @@ class AsyncPageGenerator:
             yield chunk
         yield "\n"
 
-        async for chunk in self.check_html():
-            yield chunk
+        yield await self.check_html()
+        yield "\n"
+
+        if not self.html_page.is_valid:
+            async for chunk in self.regenerate_html():
+                yield chunk
 
     async def search_images(self, user_prompt: str) -> AsyncGenerator[str]:
         message: dict = {
@@ -119,7 +134,7 @@ class AsyncPageGenerator:
     async def generate_html(self, user_prompt: str) -> AsyncGenerator[str]:
         message = {
             "role": "user",
-            "content": GENERATE_HTML_PROMPT.format(user_prompt=user_prompt),
+            "content": GENERATE_HTML_PROMPT.format(user_prompt=user_prompt, current_year=self.current_year),
         }
         ready_messages = {
             "messages": [message],
@@ -130,14 +145,33 @@ class AsyncPageGenerator:
             config=self.config,
             stream_mode="messages",
         )
+        with StringIO() as buffer:
+            async for token, _ in async_stream:
+                yield token.content
+                buffer.write(token.content)
 
-        async for token, _ in async_stream:
-            yield token.content
+            self.html_page.html_code = buffer.getvalue()
 
-    async def check_html(self) -> AsyncGenerator[str]:
+    async def check_html(self) -> str:
         message = {
             "role": "user",
             "content": CHECK_HTML_PROMPT,
+        }
+        ready_messages = {
+            "messages": [message],
+            "temperature": 0.1,
+        }
+        response = await self.agent.ainvoke(input=ready_messages, config=self.config)
+        ai_answer = response["messages"][-1].content
+
+        if 'да' in ai_answer.lower():
+            self.html_page.is_valid = True
+        return ai_answer
+
+    async def regenerate_html(self) -> AsyncGenerator[str]:
+        message = {
+            "role": "user",
+            "content": REGENERATE_HTML_PROMPT,
         }
         ready_messages = {
             "messages": [message],
