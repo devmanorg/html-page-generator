@@ -14,6 +14,11 @@
 - `DEEPSEEK_API_KEY` - API-ключ аутентификации. [Получить](https://api-docs.deepseek.com/).
 - `UNSPLASH_CLIENT_ID` - `Access Token` созданного Unsplash приложения. [Получить](https://unsplash.com/documentation#creating-a-developer-account).
 
+Если вы используете альтернативную инсталляцию DeepSeek, то необходимо также указать её URL-адрес:
+- `DEEPSEEK_BASE_URL`
+
+Если не указан, то по-умолчанию используется URL-адрес официальной [DeepSeek API](https://api-docs.deepseek.com/).
+
 # Инициализация
 
 На самом верхнем уровне приложения в момент запуска необходимо проинициализировать 2 клиентских класса.

@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from typing import Any, Optional
 
 import httpx
+from langchain_deepseek.chat_models import DEFAULT_API_BASE
 from pydantic import SecretStr
 
 from ._exceptions import AsyncDeepseekClientError
@@ -11,14 +12,27 @@ from ._exceptions import AsyncDeepseekClientError
 class AsyncDeepseekClient(httpx.AsyncClient):
     _initialized_instance: Optional['AsyncDeepseekClient'] = None
 
-    def __init__(self, deepseek_api_key: str | SecretStr, *args: Any, **kwargs: Any) -> None:
+    def __init__(
+        self,
+        deepseek_api_key: str | SecretStr,
+        deepseek_base_url: str = DEFAULT_API_BASE,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
         super().__init__(*args, **kwargs)
         self.deepseek_api_key = deepseek_api_key
+        self.deepseek_base_url = deepseek_base_url
 
     @classmethod
     @asynccontextmanager
-    async def setup(cls, deepseek_api_key: str | SecretStr, *args: Any, **kwargs: Any) -> AsyncGenerator[None]:
-        cls._initialized_instance = cls(deepseek_api_key, *args, **kwargs)
+    async def setup(
+        cls,
+        deepseek_api_key: str | SecretStr,
+        deepseek_base_url: str = DEFAULT_API_BASE,
+        *args: Any,
+        **kwargs: Any,
+    ) -> AsyncGenerator[None]:
+        cls._initialized_instance = cls(deepseek_api_key, deepseek_base_url, *args, **kwargs)
         async with cls._initialized_instance:
             yield
 

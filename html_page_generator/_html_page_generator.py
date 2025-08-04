@@ -79,6 +79,7 @@ class AsyncPageGenerator:
             model="deepseek-chat",
             api_key=http_async_client.deepseek_api_key,
             http_async_client=http_async_client,
+            api_base=http_async_client.deepseek_base_url,
         )
         self.agent = create_react_agent(
             model,
