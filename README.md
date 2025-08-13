@@ -28,7 +28,7 @@ $ pip install git+https://gitlab.dvmn.org/dvmn/courses/fastapi/html-page-generat
 Если вы используете альтернативную инсталляцию DeepSeek, то необходимо также указать её URL-адрес и, если это необходимо, другую LLM-модель:
 - `DEEPSEEK_BASE_URL` - URL-адрес альтернативной инсталляции для запросов к API.
 
-  Если не указан, то по-умолчанию используется URL-адрес официальной [DeepSeek API](https://api-docs.deepseek.com/).
+  Если не указан, то по-умолчанию используется `https://api.deepseek.com/v1`.
 
 - `DEEPSEEK_MODEL` - название альтернативной модели.
   
