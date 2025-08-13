@@ -23,12 +23,16 @@ $ pip install git+https://gitlab.dvmn.org/dvmn/courses/fastapi/html-page-generat
 Понадобятся ключи для сервисов:
 
 - `DEEPSEEK_API_KEY` - API-ключ аутентификации. [Получить](https://api-docs.deepseek.com/).
-- `UNSPLASH_CLIENT_ID` - `Access Token` созданного Unsplash приложения. [Получить](https://unsplash.com/documentation#creating-a-developer-account).
+- `UNSPLASH_CLIENT_ID` - `Access Key` созданного Unsplash приложения. [Получить](https://unsplash.com/documentation#creating-a-developer-account).
 
-Если вы используете альтернативную инсталляцию DeepSeek, то необходимо также указать её URL-адрес:
-- `DEEPSEEK_BASE_URL`
+Если вы используете альтернативную инсталляцию DeepSeek, то необходимо также указать её URL-адрес и, если это необходимо, другую LLM-модель:
+- `DEEPSEEK_BASE_URL` - URL-адрес альтернативной инсталляции для запросов к API.
 
-Если не указан, то по-умолчанию используется URL-адрес официальной [DeepSeek API](https://api-docs.deepseek.com/).
+  Если не указан, то по-умолчанию используется URL-адрес официальной [DeepSeek API](https://api-docs.deepseek.com/).
+
+- `DEEPSEEK_MODEL` - название альтернативной модели.
+  
+  Если не указано, то по-умолчанию используется модель `deepseek-chat`.
 
 ## Инициализация
 
@@ -43,10 +47,19 @@ from html_page_generator import AsyncDeepseekClient, AsyncUnsplashClient
 async def main():
     async with (
         AsyncUnsplashClient.setup("UNSPLASH_CLIENT_ID", timeout=3),
-        AsyncDeepseekClient.setup("DEEPSEEK_API_KEY")
+        AsyncDeepseekClient.setup(
+            "DEEPSEEK_API_KEY",
+            "DEEPSEEK_BASE_URL",
+            "DEEPSEEK_MODEL",
+        ),
     ):
         ...
 ```
+Замените `"UNSPLASH_CLIENT_ID"` и `"DEEPSEEK_API_KEY"` на ваши ключи доступа.
+
+Если вы используете альтернативную инсталляцию DeepSeek, замените `"DEEPSEEK_BASE_URL"` и `"DEEPSEEK_MODEL"` на данные вашей инсталляции.
+
+Если вы используете официальный [DeepSeek API](https://api-docs.deepseek.com/), то `"DEEPSEEK_BASE_URL"` и `"DEEPSEEK_MODEL"` можно не указывать.
 
 ## Генерация
 

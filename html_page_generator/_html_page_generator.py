@@ -59,6 +59,7 @@ SITE_TITLE_PROMPT = (
     "Придумай название ориентируясь на тематику запроса: '{user_prompt}'. "
     "Название должно содержать не более 3 слов, разделенных пробелами. "
     "В ответе пришли только придуманное название и ничего больше."
+    "Название не должно содержать кавычек и других спец.символов, только буквы, цифры и пробел."
 )
 
 
@@ -76,7 +77,7 @@ class AsyncPageGenerator:
 
         http_async_client = AsyncDeepseekClient.get_initialized_instance()
         model = ChatDeepSeek(
-            model="deepseek-chat",
+            model=http_async_client.deepseek_model,
             api_key=http_async_client.deepseek_api_key,
             http_async_client=http_async_client,
             api_base=http_async_client.deepseek_base_url,

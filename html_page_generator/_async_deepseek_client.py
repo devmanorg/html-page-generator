@@ -8,6 +8,7 @@ from pydantic import SecretStr
 
 from ._exceptions import AsyncDeepseekClientError
 
+DEFAULT_DEEPSEEK_MODEL = "deepseek-chat"
 
 class AsyncDeepseekClient(httpx.AsyncClient):
     _initialized_instance: Optional['AsyncDeepseekClient'] = None
@@ -16,12 +17,14 @@ class AsyncDeepseekClient(httpx.AsyncClient):
         self,
         deepseek_api_key: str | SecretStr,
         deepseek_base_url: str = DEFAULT_API_BASE,
+        deepseek_model: str = DEFAULT_DEEPSEEK_MODEL,
         *args: Any,
         **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.deepseek_api_key = deepseek_api_key
         self.deepseek_base_url = deepseek_base_url
+        self.deepseek_model = deepseek_model
 
     @classmethod
     @asynccontextmanager
@@ -29,10 +32,11 @@ class AsyncDeepseekClient(httpx.AsyncClient):
         cls,
         deepseek_api_key: str | SecretStr,
         deepseek_base_url: str = DEFAULT_API_BASE,
+        deepseek_model: str = DEFAULT_DEEPSEEK_MODEL,
         *args: Any,
         **kwargs: Any,
     ) -> AsyncGenerator[None]:
-        cls._initialized_instance = cls(deepseek_api_key, deepseek_base_url, *args, **kwargs)
+        cls._initialized_instance = cls(deepseek_api_key, deepseek_base_url, deepseek_model, *args, **kwargs)
         async with cls._initialized_instance:
             yield
 
